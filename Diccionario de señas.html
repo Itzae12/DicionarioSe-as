@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diccionario de Lenguaje de Señas Mexicanas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        input {
+            padding: 10px;
+            width: 80%;
+            margin-bottom: 20px;
+        }
+        .sign-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .sign-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px;
+            width: 200px;
+            text-align: center;
+            display: none; /* Ocultar signos por defecto */
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Diccionario de Lenguaje de Señas Mexicanas</h1>
+    <input type="text" id="search" placeholder="Buscar la palabra o letra..." onkeyup="searchSigns()">
+    
+    <div class="sign-container" id="signs"></div>
+    
+    <h2>Agregar nueva palabra</h2>
+    <input type="text" id="newWord" placeholder="Palabra">
+    <input type="text" id="newImage" placeholder="URL de la imagen/GIF">
+    <button onclick="addSign()">Agregar</button>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            let container = document.getElementById("signs");
+            container.innerHTML = "";
+        });
+        
+        function searchSigns() {
+            let query = document.getElementById("search").value.toLowerCase();
+            let container = document.getElementById("signs");
+            container.innerHTML = ""; // Limpiar resultados anteriores
+            let signs = JSON.parse(localStorage.getItem("signs")) || [];
+            
+            let exactMatch = signs.find(sign => sign.word === query);
+            
+            if (exactMatch) {
+                let card = document.createElement("div");
+                card.className = "sign-card";
+                card.setAttribute("data-word", exactMatch.word);
+                card.style.display = "block";
+                card.innerHTML = `<p><strong>${exactMatch.word.charAt(0).toUpperCase() + exactMatch.word.slice(1)}</strong></p>
+                                  <img src="${exactMatch.imageUrl}" alt="Seña de ${exactMatch.word}">`;
+                container.appendChild(card);
+            }
+        }
+        
+        function addSign() {
+            let word = document.getElementById("newWord").value.toLowerCase();
+            let imageUrl = document.getElementById("newImage").value;
+            
+            if (word && imageUrl) {
+                let signs = JSON.parse(localStorage.getItem("signs")) || [];
+                signs.push({ word, imageUrl });
+                localStorage.setItem("signs", JSON.stringify(signs));
+                
+                document.getElementById("newWord").value = "";
+                document.getElementById("newImage").value = "";
+            }
+        }
+    </script>
+</body>
+</html>
